@@ -3,11 +3,13 @@ classdef Viewport
     %   Detailed explanation goes here
     
     properties
-        width = 640
-        height = 480
-        camera_origin = [0;0;0]
-        camera_direction = normalize([1;1;1])
-        fov = 90 % in degrees
+        width = 100
+        height = 75
+        origin = [0 0 0]'
+        yaw = deg2rad(45)
+        pitch = deg2rad(0)
+        roll = deg2rad(45)
+        fov = 45 % in degrees
     end
         
     methods
@@ -16,11 +18,11 @@ classdef Viewport
             fov_y = (self.height/self.width) * fov_x;
             
             % compute tangents of the fovs
-            tan_fov_x = tan(deg2rad(fov_x));
-            tan_fov_y = tan(deg2rad(fov_y));
+            tan_fov_x = tan(deg2rad(fov_x/2));
+            tan_fov_y = tan(deg2rad(fov_y/2));
             
-            coordinate_xs = 0:(self.width - 1);
-            coordinate_ys = 0:(self.height - 1);
+            coordinate_xs = 0.5:(self.width - 0.5);
+            coordinate_ys = 0.5:(self.height - 0.5);
 
             % convert to the basic top-down camera
             projected_xs = ((2 .* coordinate_xs - self.width) ./ self.width) .* tan_fov_x;
@@ -28,24 +30,31 @@ classdef Viewport
             
             % turn them into 3 x n vector
             [xs, ys] = meshgrid(projected_xs, projected_ys);
-            raw_vectors = transpose([xs(:), ys(:), -ones(self.width * self.height, 1)]);
+            raw_vectors = normalize_multiple([xs(:), ys(:), -ones(self.width * self.height, 1)]');
             
             % now rotate to match the camera
-            rotate_matrix = self.camera_rotate_matrix;
-            ray_direction_vectors = rotate_matrix * raw_vectors;
+            rotate_matrix = self.camera_rotate_matrix();
+            ray_direction_vectors = normalize_multiple(rotate_matrix * raw_vectors);
         end
         
         function r = camera_rotate_matrix(self)
-            x = self.camera_direction(1);
-            y = self.camera_direction(2);
-            z = self.camera_direction(3);
+            cosyaw = cos(self.yaw);
+            sinyaw = sin(self.yaw);
+            cospitch = cos(self.pitch);
+            sinpitch = sin(self.pitch);
+            cosroll = cos(self.roll);
+            sinroll = sin(self.roll);
             
-            % r = I + vx + vx^2 * (1 - a.b)/||a x b||^2
-            % where a = [x y z]^T, b = [0 0 -1]^T
-            vx = [0  0  x;
-                  0  0  y;
-                 -x -y  0];
-            r = eye(3) + vx + (vx^2) * ((1 - z)/(x^2 + y^2));
+            yawm = [cosyaw -sinyaw 0;
+                    sinyaw cosyaw  0;
+                    0 0 1];
+            pitchm = [cospitch 0 sinpitch;
+                      0 1 0;
+                      -sinpitch 0 cospitch];
+            rollm = [1 0 0;
+                     0 cosroll -sinroll;
+                     0 sinroll cosroll];
+            r = yawm * pitchm * rollm;
         end
     end
     

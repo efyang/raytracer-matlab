@@ -3,7 +3,7 @@ image = zeros(im);
 for ii = 0:im - 1
     image = image + diag((im - ii) * ones(im - ii, 1),ii) + diag((im - ii) * ones(im - ii, 1), -ii);
 end
-    
+
 nextframe = image;
 h = imagesc(image);
 
