@@ -3,13 +3,13 @@ classdef Viewport
     %   Detailed explanation goes here
     
     properties
-        width = 100
-        height = 75
-        origin = [0 0 0]'
-        yaw = deg2rad(45)
-        pitch = deg2rad(0)
-        roll = deg2rad(45)
-        fov = 45 % in degrees
+        width = 640
+        height = 480
+        origin = [0 0 4]'
+        yaw = deg2rad(-45)
+        pitch = deg2rad(0) % rotation of screen
+        roll = deg2rad(22.5)
+        fov = 90 % in degrees
     end
         
     methods

@@ -13,20 +13,32 @@ classdef Scene < handle
             image = zeros(viewport.height, viewport.width, 3);
             rays = viewport.generate_rays();
             
-            figure(1);
-            quiver3(zeros(viewport.width*viewport.height, 1)', zeros(viewport.width*viewport.height, 1)', zeros(viewport.width*viewport.height, 1)', rays(1, :), rays(2, :), rays(3, :));
-            xlabel('x');
-            ylabel('y');
-            zlabel('z');
+            %figure(1);
+            %quiver3(viewport.origin(1)*ones(viewport.width*viewport.height, 1)',...
+            %    viewport.origin(2)*ones(viewport.width*viewport.height, 1)',...
+            %    viewport.origin(3)*ones(viewport.width*viewport.height, 1)',...
+            %    rays(1, :)*10,...
+            %    rays(2, :)*10,...
+            %    rays(3, :)*10);
+            %xlabel('x');
+            %ylabel('y');
+            %zlabel('z');
             
             % for each ray
                 % for each object get intersections
             % apply rowfun for each ray
+            % Format of ray vector:
+            %| rx rx rx rx rx |
+            %| ry ry ry ry ry |
+            %| rz rz rz rz rz |
             for ray = rays
                 for object = self.material_objects
                     [intersect, t] = object.ray_intersect(viewport.origin, ray);
-            %        disp(intersect);
-            %        disp(t);
+                    %if intersect
+                    %    disp('intersect');
+                    %end
+                    %disp(intersect);
+                    %disp(t);
                 end
             end
         end
